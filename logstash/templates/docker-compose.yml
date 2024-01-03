@@ -1,0 +1,23 @@
+services:
+  logstash:
+    image: logstash:7.17.15
+    restart: unless-stopped
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+     - ./:/etc/logstash/conf.d
+    environment:
+      LOGSTASH_INTERNAL_PASSWORD: "password"
+
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 512m
+    networks:
+      - elk
+
+networks:
+  elk:
+    driver: bridge 

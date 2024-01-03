@@ -1,0 +1,23 @@
+- name: Ensure directories exists
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    mode: '0644'
+  loop:
+    - ~/compose/filebeat
+
+- name: Ensure docker-compose file has been updated
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: ~/compose/filebeat/
+    mode: '0644'
+  loop:
+    - docker-compose.yml
+    - filebeat.yml
+
+- name: Ensure filebeat compose files are up
+  community.docker.docker_compose:
+    state: present
+    project_src: ~/compose/filebeat/
+    files:
+      - docker-compose.yml

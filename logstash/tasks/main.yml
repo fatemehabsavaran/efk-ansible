@@ -1,0 +1,23 @@
+- name: Ensure directories exists
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    mode: '0644'
+  loop:
+    - ~/compose/logstash
+
+- name: Ensure docker-compose file has been updated
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: ~/compose/logstash/
+    mode: '0644'
+  loop:
+    - docker-compose.yml
+    - logstash.conf
+
+- name: Ensure logstash compose files are up
+  community.docker.docker_compose:
+    state: present
+    project_src: ~/compose/logstash/
+    files:
+      - docker-compose.yml

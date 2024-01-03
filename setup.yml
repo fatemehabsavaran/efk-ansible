@@ -1,0 +1,7 @@
+- name: Play for initializing server
+  hosts: main
+  roles:
+    - elasticsearch-kibana
+    - logstash
+    - filebeat
+

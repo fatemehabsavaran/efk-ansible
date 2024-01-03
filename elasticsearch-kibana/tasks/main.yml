@@ -1,0 +1,22 @@
+- name: Ensure directories exists
+  ansible.builtin.file:
+    dest: "{{ item }}"
+    state: directory
+    mode: '0644'
+  loop:
+    - ~/compose/elasticsearch
+
+- name: Ensure docker-compose file has been updated
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: ~/compose/elasticsearch/
+    mode: '0644'
+  loop:
+    - docker-compose.yml
+
+- name: Ensure elasticsearch compose files are up
+  community.docker.docker_compose:
+    state: present
+    project_src: ~/compose/elasticsearch/
+    files:
+      - docker-compose.yml
