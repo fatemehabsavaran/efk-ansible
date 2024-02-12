@@ -1,7 +1,12 @@
-- name: Play for initializing server
-  hosts: main
+- name: Deploy main
+  hosts: "main"
+  become: true
+  become_user: root
+  vars_files:
+    - "vars/vars.yml"
+  vars:
+    ssh_private_key_location: ~/.ssh/sample
   roles:
-    - elasticsearch-kibana
-    - logstash
-    - filebeat
-
+    - efk
+ 
+   

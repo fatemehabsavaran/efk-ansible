@@ -47,6 +47,22 @@ services:
     networks:
       - elk
       - web
+
+  fluentd:
+    container_name: fluentd
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "./fluent.conf:/fluentd/etc/fluent.conf"
+    depends_on:
+      - "es01"
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    networks:
+      - elk
    
 volumes:
   es01:

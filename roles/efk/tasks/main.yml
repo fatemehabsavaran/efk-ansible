@@ -4,20 +4,22 @@
     state: directory
     mode: '0644'
   loop:
-    - ~/compose/logstash
+    - ~/compose/efk
 
 - name: Ensure docker-compose file has been updated
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: ~/compose/logstash/
+    dest: ~/compose/efk/
     mode: '0644'
   loop:
     - docker-compose.yml
-    - logstash.conf
+    - Dockerfile
+    - fluentd.conf
 
-- name: Ensure logstash compose files are up
+
+- name: Ensure efk compose files are up
   community.docker.docker_compose:
     state: present
-    project_src: ~/compose/logstash/
+    project_src: ~/compose/efk/
     files:
       - docker-compose.yml
