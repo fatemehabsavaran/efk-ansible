@@ -4,7 +4,7 @@
 ‍‍‍‍‍‍
 
 Add variables in `vars.yml` file.
-‍```
+
 
 Add ssh config hostname to `hosts`
 ```
