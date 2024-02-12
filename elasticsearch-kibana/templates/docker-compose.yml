@@ -1,46 +1,59 @@
 services:
- elasticsearch:
-    image: elasticsearch:8.11.1
-    container_name: elasticsearch
+  es01:
+    image: elasticsearch:${STACK_VERSION}
+    container_name: elastic
+    # ports:
+    #   - "127.0.0.1:9200:9200"
     environment:
+      - discovery.type= single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - bootstrap.memory_lock=true
       - discovery.type=single-node
-      # - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - ELASTIC_PASSWORD=password
+
+    volumes:
+      - es01:/usr/share/elasticsearch/data
+    networks:
+      - elk
+
+    mem_limit: 1073741824
     ulimits:
       memlock:
         soft: -1
         hard: -1
-    mem_limit: 512m
 
-    ports:
-      - "127.0.0.1:9200:9200"
-      - "127.0.0.1:9300:9300"
+
+  kibana:
+    image: kibana:7.17.17
+    container_name: kibana
     volumes:
-      - esdata:/usr/share/elasticsearch/data
+      - kibanadata:/usr/share/kibana/data
+    depends_on:
+      - es01
+    environment:
+      SERVERNAME: kibana
+      ELASTICSEARCH_HOSTS: http://es01:9200
+      ELASTICSEARCH_USERNAME: kibana_system
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD}
+      
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.kibana.entrypoints=http,https"
+      - "traefik.http.routers.kibana.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.kibana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kibana.loadbalancer.server.port=5601"
+      - "traefik.http.middlewares.kibana-auth.basicauth.users=${traefik_dashboard_username}:${traefik_dashboard_password}"
+      - "traefik.http.routers.kibana.middlewares=kibana-auth"
     networks:
       - elk
-
-
-
- kibana:
-   container_name: kibana
-   image: kibana:8.11.1
-   environment:
-     - ELASTICSEARCH_HOSTS=http://localhost:9200
-     - KIBANA_PASSWORD=password
-   ports:
-     - 5601:5601
-   depends_on:
-     - elasticsearch
-
-   networks:
-     - elk
- 
-
+      - web
+   
 volumes:
-  esdata:
+  es01:
+  kibanadata:
 
 networks:
   elk:
-  
-    
+    external: true
+  web:
+    external: true
